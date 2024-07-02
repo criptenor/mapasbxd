@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa de Coletivos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Adicione o CSS conforme descrito anteriormente */
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#">
+            <img class="logo" src="src/logo.png" alt="Logo">
+        </a>
+        <nav class="menuNav">
+            <ul class="menuList">
+                <li class="menuItem">
+                    <a href="#">Início</a>
+                </li>
+                <li class="menuItem">
+                    <a href="#">Sobre</a>
+                </li>
+                <li class="menuItem">
+                    <a href="#">Projetos</a>
+                </li>
+                <li class="menuItem">
+                    <a href="#">Contato</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="mainContainer">
+        <section class="mapDescriptionSection">
+            <h1 class="descTitle">Mapa de Coletivos</h1>
+            <p class="descParagraph">Encontre coletivos em diversas localidades e explore suas descrições.</p>
+        </section>
+        <section class="mapDescriptionSectionRight">
+            <div id="map">{{ mapa_html|safe }}</div>
+        </section>
+    </div>
+    <div class="wrapper">
+        <form id="filter-form">
+            <input type="text" id="nome" name="nome" placeholder="Nome do coletivo">
+            <input type="text" id="descricao" name="descricao" placeholder="Descrição">
+            <input type="text" id="cidade" name="cidade" placeholder="Cidade">
+            <label for="data_inicio">Data de Início:</label>
+            <input type="date" id="data_inicio" name="data_inicio">
+            <label for="data_fim">Data de Fim:</label>
+            <input type="date" id="data_fim" name="data_fim">
+            <button type="button" class="form-button" onclick="applyFilters()">Filtrar</button>
+        </form>
+        <div id="cards-container">
+            {% for coletivo in dados_coletivo %}
+                <div class="card">
+                    <img src="{{ coletivo['imagem'] or 'src/default_image.png' }}" alt="{{ coletivo['nome'] }}" class="cardImage">
+                    <div class="cardName">{{ coletivo['nome'] }}</div>
+                    <div class="cardDescription">{{ coletivo['descricao'] }}</div>
+                    <div class="cardLocation">{{ coletivo['cidade'] }}</div>
+                    <div class="popup">
+                        <p>{{ coletivo['descricao'] }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="footer">
+        <h2 class="footerTitle">Contato</h2>
+        <ul class="footerContatcsList">
+            <li><a class="footerContatcsLink" href="#">Telefone</a></li>
+            <li><a class="footerContatcsLink" href="#">Email</a></li>
+            <li><a class="footerContatcsLink" href="#">Endereço</a></li>
+        </ul>
+        <ul class="footerSocialList">
+            <li><a class="footerSocialLink" href="#">FB</a></li>
+            <li><a class="footerSocialLink" href="#">IG</a></li>
+            <li><a class="footerSocialLink" href="#">TW</a></li>
+        </ul>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseover', () => {
+                    const popup = card.querySelector('.popup');
+                    popup.style.display = 'flex';
+                });
+                card.addEventListener('mouseout', () => {
+                    const popup = card.querySelector('.popup');
+                    popup.style.display = 'none';
+                });
+            });
+        });
+
+        function applyFilters() {
+            const nome = document.getElementById('nome').value;
+            const descricao = document.getElementById('descricao').value;
+            const cidade = document.getElementById('cidade').value;
+            const data_inicio = document.getElementById('data_inicio').value;
+            const data_fim = document.getElementById('data_fim').value;
+
+            const data = {
+                nome: nome,
+                descricao: descricao,
+                cidade: cidade,
+                data_inicio: data_inicio,
+                data_fim: data_fim
+            };
+
+            fetch('/filtrar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateMapAndCards(data.coletivos);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function updateMapAndCards(coletivos) {
+            // Atualizar o mapa
+            document.getElementById('map').innerHTML = coletivos.map_html;
+
+            // Atualizar os cartões
+            const cardsContainer = document.getElementById('cards-container');
+            cardsContainer.innerHTML = '';
+            coletivos.forEach(coletivo => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <img src="${coletivo.imagem || 'src/default_image.png'}" alt="${coletivo.nome}" class="cardImage">
+                    <div class="cardName">${coletivo.nome}</div>
+                    <div class="cardDescription">${coletivo.descricao}</div>
+                    <div class="cardLocation">${coletivo.cidade}</div>
+                    <div class="popup">
+                        <p>${coletivo.descricao}</p>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>

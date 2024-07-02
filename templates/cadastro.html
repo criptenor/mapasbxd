@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Coletivos da Baixada Fluminense</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logoBox">
+            <img class="logo"
+                src="https://fgvqqqgcyujztipjpsta.supabase.co/storage/v1/object/sign/foto_coletivo/bxdMaps.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJmb3RvX2NvbGV0aXZvL2J4ZE1hcHMucG5nIiwiaWF0IjoxNzE5MzU2MDI5LCJleHAiOjE3NTA4OTIwMjl9.lRqtIWFLXUY803SddFO_aiO4V5pBPlTXbuOadmAn2rA&t=2024-06-25T22%3A53%3A49.278Z"
+                alt="logo">
+        </div>
+        <a href="/API">API</a>
+        <a href="/cadastro">Cadastro</a>
+        <a href="/#roll">Mapa Cultural</a>
+    </header>
+    <div class="container form-container">
+        <h1 class="form-title">Cadastro de Coletivos da Baixada Fluminense</h1>
+        <form id="coletivoForm" onsubmit="enviarFormulario(event)">
+
+            <div style="flex-direction: row">
+                <div class="form-group inline">
+                    <div style="flex-direction: column">
+                        <span>Nome do Projeto</span>
+                        <div class="form name">
+                            <input type="text" class="input" placeholder="Digite o nome do projeto" name="nome_projeto" required>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column">
+                        <span>Sigla</span>
+                        <div class="form sigla">
+                            <input type="text" class="input" placeholder="Sigla" name="sigla" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span>Email Institucional</span>
+                <div class="form">
+                    <input type="email" class="input" placeholder="Digite o email" name="email" required>
+                </div>
+            </div>
+            <div class="form-group inline">
+                <div style="flex-direction: column; min-width: 49.5%">
+                    <span>Senha</span>
+                    <div class="form">
+                        <input type="password" class="input" placeholder="Digite a senha" name="senha" required>
+                    </div>
+                </div>
+                <div style="flex-direction: column; min-width: 49.5%">
+                    <span>Confirme a Senha</span>
+                    <div class="form">
+                        <input type="password" class="input" placeholder="Confirme a senha" name="confirm_senha" required>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span>Número de Celular</span>
+                <div class="form">
+                    <input type="text" class="input" placeholder="Digite o número de celular" name="numero_celular">
+                </div>
+            </div>
+            <div class="form-group">
+                <span>Link para Redes Sociais</span>
+                <div class="form">
+                    <input type="text" class="input" placeholder="https://instagram.com/gcd.bxd" name="link" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="autocomplete-container">
+                    <button type="button" id="locate-button" class="red-button" onclick="obterCoordenadas()">Localizar</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <span>Descrição do Coletivo</span>
+                <div class="form" style="height: 200px;">
+                    <textarea name="DescColetivo" class="input" rows="6" placeholder="Descreva o coletivo" required></textarea>
+                </div>
+            </div>
+            <label for="txtLatitude" style="visibility: hidden">Latitude:</label>
+            <input type="text" id="txtLatitude" name="latitude" style="visibility: hidden" readonly>
+
+            <label for="txtLongitude" style="visibility: hidden">Longitude:</label>
+            <input type="text" id="txtLongitude" style="visibility: hidden" name="longitude" readonly>
+
+            <button type="submit" class="submit enviar" id="enviar">Enviar</button>
+        </form>
+    </div>
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://fgvqqqgcyujztipjpsta.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZndnFxcWdjeXVqenRpcGpwc3RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTkzNDQ3MTYsImV4cCI6MjAzNDkyMDcxNn0.d0uL6yzSavALzO76gXopEdJ0fPVW6FVL9SUCQr1p0A4';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        function obterCoordenadas() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(posicao) {
+                        var latitude = posicao.coords.latitude;
+                        var longitude = posicao.coords.longitude;
+
+                        console.log("Latitude: " + latitude + ", Longitude: " + longitude);
+
+                        // Preencha os campos do formulário
+                        document.getElementById('txtLatitude').value = latitude;
+                        document.getElementById('txtLongitude').value = longitude;
+
+                        // Mude o botão para verde e texto "Local coletado"
+                        var button = document.getElementById('locate-button');
+                        button.classList.remove('red-button');
+                        button.classList.add('green-button');
+                        button.textContent = "Local coletado";
+                    },
+                    function(erro) {
+                        console.log('Erro ao obter a localização:', erro);
+                        console.log('Erro ao obter a localização: ' + erro.message);
+                    },
+                    {
+                        enableHighAccuracy: true, // Ativar alta precisão
+                        timeout: 10000,           // Tempo limite de 10 segundos
+                        maximumAge: 0             // Não usar localização em cache
+                    }
+                );
+            } else {
+                alert("Geolocalização não suportada neste navegador.");
+            }
+        }
+
+
+
+        function enviarFormulario(event) {
+            event.preventDefault();
+
+            const formData = {
+                nome_projeto: document.getElementById('coletivoForm').elements['nome_projeto'].value,
+                sigla: document.getElementById('coletivoForm').elements['sigla'].value,
+                email: document.getElementById('coletivoForm').elements['email'].value,
+                senha: document.getElementById('coletivoForm').elements['senha'].value,
+                confirm_senha: document.getElementById('coletivoForm').elements['confirm_senha'].value,
+                numero_celular: document.getElementById('coletivoForm').elements['numero_celular'].value,
+                DescColetivo: document.getElementById('coletivoForm').elements['DescColetivo'].value,
+                link: document.getElementById('coletivoForm').elements['link'].value,
+                latitude: document.getElementById('txtLatitude').value,
+                longitude: document.getElementById('txtLongitude').value,
+
+            };
+
+            fetch('/submit_form', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            }).then(response => response.text())
+              .then(data => {
+                  // Redireciona para outra página
+                  window.location.href = "/";
+              }).catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao enviar o formulário: ' + error.message);
+              });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</body>
+</html>
