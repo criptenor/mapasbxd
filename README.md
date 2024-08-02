@@ -1,12 +1,12 @@
-# Mapa MXD
+# Mapa BXD
 
-![Mapa MXD](bxd.png)
+![Mapa BXD](bxd.png)
 
-Visando promover a produção de cultura na região geográfica da Baixada Fluminense, o coletivo InforCrias, através do setor de desenvolvimento de software liderado por Adeilton dos Santos, desenvolveu o Mapa MXD. Este é um mapa de fomento de atividades culturais, fornecendo uma API em JSON para requisição de dados pelos coletivos culturais.
+Visando promover a produção de cultura na região geográfica da Baixada Fluminense, o coletivo InforCrias, através do setor de desenvolvimento de software liderado por Adeilton dos Santos, desenvolveu o Mapa BXD. Este é um mapa de fomento de atividades culturais, fornecendo uma API em JSON para requisição de dados pelos coletivos culturais.
 
 ## Visão Geral
 
-O Mapa MXD é uma ferramenta inovadora destinada a coletivos culturais e organizações que atuam na Baixada Fluminense. Ele facilita o acesso a informações sobre eventos, atividades e iniciativas culturais na região, promovendo a colaboração e o crescimento da produção cultural local.
+O Mapa BXD é uma ferramenta inovadora destinada a coletivos culturais e organizações que atuam na Baixada Fluminense. Ele facilita o acesso a informações sobre eventos, atividades e iniciativas culturais na região, promovendo a colaboração e o crescimento da produção cultural local.
 
 ## Funcionalidades Principais
 
