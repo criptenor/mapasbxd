@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Coletivos da Baixada Fluminense</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link rel="stylesheet" href="style.css">
+<style>
+    body {
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    width: 400px;
+    /* height: 600px; */
+    margin: auto;
+    margin-top: 5%;
+    /* margin: auto; */
+    background-color: #011522;
+    border-radius: 8px;
+    z-index: 1;
+
+}
+
+.tools {
+ display: flex;
+ align-items: center;
+ padding: 9px;
+}
+
+.circle {
+ padding: 0 4px;
+}
+
+.box {
+ display: inline-block;
+ align-items: center;
+ width: 10px;
+ height: 10px;
+ padding: 1px;
+ border-radius: 50%;
+}
+
+.red {
+ background-color: #ff605c;
+}
+
+.yellow {
+ background-color: #ffbd44;
+}
+
+.green {
+ background-color: #00ca4e;
+}
+
+
+    body {
+        background-color: #262636;
+        color: white;
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #262636;
+    }
+    .logoBox {
+        display: flex;
+        align-items: center;
+    }
+    .logo {
+        width: 100px;
+    }
+    .header a {
+        color: #FA6A24;
+        text-decoration: none;
+        margin-left: 20px;
+        font-weight: bold;
+    }
+    .form-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #2a4d69;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #FA6A24;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .logo-upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .logo-upload-container span {
+        margin-bottom: 10px;
+    }
+    .logo-placeholder {
+        width: 125px;
+        height: 125px;
+        background-color: #ffffff;
+        border: 2px solid #3d5a80;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+    }
+    .logo-placeholder input[type="file"] {
+        display: none;
+    }
+    .logo-placeholder img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .form-group span {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .submit {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .submit:hover {
+        background-color: #45a049;
+    }
+    .form-group.inline {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    .form-group.inline .form {
+        flex: 1;
+    }
+    .form-group.inline .form.sigla {
+        flex: 0 0 20%;
+    }
+    /* Estilo para o formulário */
+    .form {
+      --timing: 0.3s;
+      --width-of-input: 100%; /* Ajuste para 100% para que os inputs ocupem a largura total */
+      --height-of-input: 40px;
+      --border-height: 2px;
+      --input-bg: #fff;
+      --border-color: #2f2ee9;
+      --border-radius: 30px;
+      --after-border-radius: 1px;
+      position: relative;
+      width: var(--width-of-input);
+      height: var(--height-of-input);
+      display: flex;
+      align-items: center;
+      padding-inline: 0.8em;
+      border-radius: var(--border-radius);
+      transition: border-radius 0.5s ease;
+      background: var(--input-bg,#fff);
+    }
+
+    /* Estilo para os inputs */
+
+    input:not(:placeholder-shown) ~ .reset {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .form svg {
+      width: 17px;
+      margin-top: 3px;
+    }
+
+    /* Removendo estilo padrão do botão */
+    .form button {
+      border: none;
+      background: none;
+      color: #8b8ba7;
+    }
+    .name{
+      width: 175%;
+    }
+    .input-group {
+        flex-direction: column;
+        padding: 10px;
+        padding: 10px;
+  display: flex;
+
+    justify-content: center;
+        align-items: flex-start
+}
+
+.input {
+  min-height: 50px;
+  width: 75%;
+  padding: 0 1rem;
+  color: #fff;
+  font-size: 15px;
+  border: 1px solid #5e4dcd;
+  border-radius: 6px 0 0 6px;
+  background-color: transparent;
+}
+
+.button--submit {
+  min-height: 50px;
+  padding: .5em 1em;
+  border: none;
+  border-radius: 0 6px 6px 0;
+  background-color: #5e4dcd;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color .3s ease-in-out;
+}
+
+.button--submit:hover {
+  background-color: #5e5dcd;
+}
+
+.input:focus, .input:focus-visible {
+  border-color: #3898EC;
+  outline: none;
+}
+.card__content{
+    justify-content: left;
+    margin-top: 10%;
+}
+ .button--submit.copy {
+            transition: background-color 0.3s;
+        }
+
+        .buttonLink {
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    height: 64px;
+    width: 192px;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #FA6A24;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+</style>
+    <script>
+
+</script>
+
+
+
+</head>
+<body>
+<header class="header">
+    <div class="logoBox">
+        <img class="logo"
+             src="https://fgvqqqgcyujztipjpsta.supabase.co/storage/v1/object/sign/foto_coletivo/bxdMaps.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJmb3RvX2NvbGV0aXZvL2J4ZE1hcHMucG5nIiwiaWF0IjoxNzE5MzU2MDI5LCJleHAiOjE3NTA4OTIwMjl9.lRqtIWFLXUY803SddFO_aiO4V5pBPlTXbuOadmAn2rA&t=2024-06-25T22%3A53%3A49.278Z"
+             alt="logo">
+    </div>
+     <a href="/API">API</a>
+            <a href="/cadastro">Cadastro</a>
+            <a href="/" onclick="scrollToFooter(event)">Mapa Cultural</a>
+            <a class="buttonLink" href="/adm" target="" style="color: aliceblue;">Administrar</a>
+</header>
+<script>
+
+        function scrollToFooter(event) {
+        event.preventDefault();
+        window.location.href = "/#roll";
+    }
+</script>
+
+
+<div class="card">
+    <div class="tools">
+        <div class="circle">
+            <span class="red box"></span>
+        </div>
+        <div class="circle">
+            <span class="yellow box"></span>
+        </div>
+        <div class="circle">
+      <span class="green box"></span>
+    </div>
+  </div>
+  <div class="card__content">
+      <div class="input-group">
+           <span>GET</span>
+          <div class="" style="flex-direction: row; width:100%;">
+
+    <input type="email" class="input" id="Email" name="Email" placeholder="mapabxd.com/_api" autocomplete="off">
+    <input class="button--submit copy" value="Copiar" type="submit">
+          </div>
+          <span style="font-size: 12px; margin-top: 20px">
+              Para acessar todos os dados disponíveis pelo Mapas BXD em formato JSON, realize uma requisição HTTP utilizando o método GET para o endpoint acima. Isso permitirá que você recupere as informações necessárias de maneira eficiente e padronizada para alimentar seu sistema, ou outro fim.
+          </span>
+          <script>
+   document.addEventListener('DOMContentLoaded', function () {
+    const button = document.querySelector('.button--submit.copy');
+    const apiUrl = 'https://mapabxd.com/_api';
+
+    button.addEventListener('click', function () {
+        copyToClipboard(apiUrl);
+        button.style.backgroundColor = '#FA6A24';
+        button.value = 'Copiado!';
+    });
+
+    function copyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+    }
+});
+
+          </script>
+
+</div>
+
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script>
+    flatpickr("input[type=date]", {
+        locale: "pt"
+    });
+</script>
+</body>
+</html>

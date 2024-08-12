@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Coletivos da Baixada Fluminense</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="static/js/coletivos.js"></script> <!-- Inclua o arquivo coletivos.js -->
+</head>
+<body>
+    <header class="header">
+        <div class="logoBox">
+            <img class="logo"
+                src="https://fgvqqqgcyujztipjpsta.supabase.co/storage/v1/object/sign/foto_coletivo/bxdMaps.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJmb3RvX2NvbGV0aXZvL2J4ZE1hcHMucG5nIiwiaWF0IjoxNzE5MzU2MDI5LCJleHAiOjE3NTA4OTIwMjl9.lRqtIWFLXUY803SddFO_aiO4V5pBPlTXbuOadmAn2rA&t=2024-06-25T22%3A53%3A49.278Z"
+                alt="logo">
+        </div>
+        <a href="/API">API</a>
+        <a href="/cadastro">Cadastro</a>
+        <a href="/#roll">Mapa Cultural</a>
+        <a class="buttonLink" id="buttonLink" style="color:aliceblue" href="/adm" target="">Gerenciar</a>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const buttonLink = document.getElementById('buttonLink');
+    
+                if (buttonLink) {
+                    fetch('static/coletivos.json')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Verifica se a variável data é um array e tem pelo menos um item
+                            if (Array.isArray(data) && data.length > 0) {
+                                buttonLink.textContent = 'Gerenciar';
+                                buttonLink.href = '/adm';
+                            } else {
+                                buttonLink.textContent = 'Login';
+                                buttonLink.href = '/login';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao carregar o JSON:', error);
+                            // Caso ocorra um erro ao carregar o JSON, exibe uma mensagem padrão
+                            buttonLink.textContent = 'Login';
+                            buttonLink.href = '/login';
+                        });
+                }
+            });
+        </script>
+    </header>
+    
+    <div class="container form-container">
+        <h1 class="form-title">Cadastro de Coletivos da Baixada Fluminense</h1>
+        <form id="coletivoForm" onsubmit="enviarFormulario(event)">
+            <div style="flex-direction: row">
+                <div class="form-group inline">
+                    <div style="flex-direction: column">
+                        <span>Nome do Projeto</span>
+                        <div class="form name">
+                            <input type="text" class="input" placeholder="Digite o nome do projeto" name="nome_projeto" required>
+                        </div>
+                    </div>
+                    <div style="flex-direction: column">
+                        <span>Sigla</span>
+                        <div class="form sigla">
+                            <input type="text" class="input" placeholder="Sigla" name="sigla" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span>Nome do Responsável pela inscrição</span>
+                <div class="form">
+                    <input type="text" class="input" placeholder="Digite seu nome" name="nome_resp" required>
+                </div>
+            </div>
+            <div class="form-group email-field">
+                <span>Email Institucional</span>
+                <div class="form">
+                    <input type="email" class="input" placeholder="Digite o email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="form-group senha-field inline">
+                <div style="flex-direction: column; min-width: 49.5%">
+                    <span>Senha</span>
+                    <div class="form">
+                        <input type="password" class="input" placeholder="Digite a senha" name="senha" required>
+                    </div>
+                </div>
+                <div style="flex-direction: column; min-width: 49.5%">
+                    <span>Confirme a Senha</span>
+                    <div class="form">
+                        <input type="password" class="input" placeholder="Confirme a senha" name="confirm_senha" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <span>Link para Redes Sociais</span>
+                <div class="form">
+                    <input type="text" class="input" placeholder="https://instagram.com/gcd.bxd" name="link" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="autocomplete-container">
+                    <button type="button" id="locate-button" class="red-button" onclick="abrirPopUp()">Definir Local</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <span>Descrição do Coletivo</span>
+                <div class="form" style="height: 200px;">
+                    <textarea name="DescColetivo" class="input" rows="6" placeholder="Descreva o coletivo" required></textarea>
+                </div>
+            </div>
+            <label for="txtLatitude" style="visibility: hidden">Latitude:</label>
+            <input type="text" id="txtLatitude" name="latitude" style="visibility: hidden" readonly>
+    
+            <label for="txtLongitude" style="visibility: hidden">Longitude:</label>
+            <input type="text" id="txtLongitude" name="longitude" style="visibility: hidden" readonly>
+    
+            <button type="submit" class="submit enviar" id="enviar">Enviar</button>
+        </form>
+    </div>
+    
+    <!-- Fundo opaco e pop-up -->
+    <div class="overlay" id="overlay">
+        <div class="pop-up-localizacao">
+            <div class="card"> 
+                <button class="dismiss" type="button" onclick="fecharPopUp()">×</button> 
+                <div class=""> 
+                    <div class="loader"></div>
+                    <div class="content">
+                        <span class="title">Onde o ponto Cultural se encontra?</span> 
+                        <p class="message">Atenção: ao clicar na opção: Aqui!, estará compartilhando sua localização atual.</p> 
+                    </div> 
+                    <div class="actions">
+                        <button class="history" type="button" onclick="obterLocalizacao()">Aqui!</button> 
+                        <button class="track" type="button">Em outro lugar</button> 
+                    </div> 
+                </div> 
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Carrega o arquivo JSON
+            fetch('/static/coletivos.json')
+                .then(response => response.json())
+                .then(coletivos => {
+                    if (Array.isArray(coletivos) && coletivos.length > 0) {
+                        const primeiroItem = coletivos[0];
+                        const emailContainer = document.querySelector('.email-field');
+                        const senhaContainer = document.querySelector('.senha-field');
+
+                        if (emailContainer && senhaContainer) {
+                            // Preenche os campos com os valores do primeiro item
+                            const emailField = emailContainer.querySelector('input[name="email"]');
+                            const senhaField = senhaContainer.querySelector('input[name="senha"]');
+                            const confirmSenhaField = senhaContainer.querySelector('input[name="confirm_senha"]');
+
+                            if (emailField && senhaField && confirmSenhaField) {
+                                emailField.value = primeiroItem.email;
+                                senhaField.value = primeiroItem.senha;
+                                confirmSenhaField.value = primeiroItem.senha;
+
+                                // Esconde o container que contém os campos de e-mail, senha e confirmar senha
+                                emailContainer.style.display = 'none';
+                                senhaContainer.style.display = 'none';
+                            }
+                        }
+                    }
+                })
+                .catch(error => console.error('Erro ao carregar o JSON:', error));
+        });
+
+        function enviarFormulario(event) {
+            event.preventDefault();
+
+            const formData = {
+                nome_projeto: document.getElementById('coletivoForm').elements['nome_projeto'].value,
+                sigla: document.getElementById('coletivoForm').elements['sigla'].value,
+                email: document.getElementById('coletivoForm').elements['email'].value,
+                senha: document.getElementById('coletivoForm').elements['senha'].value,
+                confirm_senha: document.getElementById('coletivoForm').elements['confirm_senha'].value,
+                DescColetivo: document.getElementById('coletivoForm').elements['DescColetivo'].value,
+                link: document.getElementById('coletivoForm').elements['link'].value,
+                latitude: document.getElementById('txtLatitude').value,
+                longitude: document.getElementById('txtLongitude').value,
+            };
+
+            fetch('/submit_form', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData),
+            }).then(response => response.text())
+              .then(data => {
+                  // Redireciona para outra página
+                  window.location.href = "/";   
+              }).catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao enviar o formulário: ' + error.message);
+              });
+        }
+
+        function abrirPopUp() {
+            document.getElementById('overlay').style.display = 'flex';
+        }
+
+        function fecharPopUp() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function obterLocalizacao() {
+            // Implementação para obter localização
+        }
+    </script>
+</body>
+</html>

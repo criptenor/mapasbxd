@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Coletivos</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/css/style.css">
+
+</head>
+<body>
+    <header class="header">
+        <div class="logoBox">
+            <img class="logo" src="https://fgvqqqgcyujztipjpsta.supabase.co/storage/v1/object/sign/foto_coletivo/bxdMaps.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJmb3RvX2NvbGV0aXZvL2J4ZE1hcHMucG5nIiwiaWF0IjoxNzE5MzU2MDI5LCJleHAiOjE3NTA4OTIwMjl9.lRqtIWFLXUY803SddFO_aiO4V5pBPlTXbuOadmAn2rA&t=2024-06-25T22%3A53%3A49.278Z" alt="logo">
+        </div>
+        <a href="/API">API</a>
+        <a href="/cadastro">Cadastro</a>
+        <a href="/#roll">Mapa Cultural</a>
+        <button class="buttonLink" id="buttonLink" style="color: aliceblue;">Sair</button>
+    </header>
+    
+    <div class="container" style="min-width: 95%;">
+        <h3>Coletivos Vinculados a sua conta</h3>
+        <div id="coletivos_vinculados_a_conta" class="carousel-container">
+            <!-- Lista de coletivos vai aqui -->
+        </div>
+    </div>
+    
+    <!-- Formulário de edição -->
+    <div class="container form-container" id="form-container" style="display: none;">
+        <h1 class="form-title">Gerenciar Projeto</h1>
+        <form id="coletivoForm" onsubmit="enviarFormulario(event)">
+            <div class="form-group inline">
+                <div class="form-group">
+                    <label for="nome_projeto">Nome do Projeto</label>
+                    <input type="text" class="input" id="nome_projeto" name="nome_projeto" placeholder="Digite o nome do projeto" required style="max-height: 35px;">
+                </div>
+                <div class="form-group">
+                    <label for="sigla">Sigla</label>
+                    <input type="text" class="input" id="sigla" name="sigla" placeholder="Sigla" required style="max-height: 35px;">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="link">Link para Redes Sociais</label>
+                <input type="text" class="input" id="link" name="link" placeholder="https://instagram.com/gcd.bxd" required>
+            </div>
+            <div class="form-group">
+                <button type="button" id="locate-button" class="btn btn-danger" onclick="abrirPopUp()">Definir novo local</button>
+            </div>
+            <div class="form-group">
+                <label for="DescColetivo">Descrição do Coletivo</label>
+                <textarea id="DescColetivo" name="DescColetivo" class="input" rows="6" placeholder="Descreva o coletivo" required></textarea>
+            </div>
+            <input type="hidden" id="txtLatitude" name="latitude">
+            <input type="hidden" id="txtLongitude" name="longitude">
+            <button type="submit" class="btn btn-primary" id="enviar">Salvar alterações</button>
+        </form>
+    </div>
+    
+    <!-- Fundo opaco e pop-up -->
+    <div class="overlay" id="overlay">
+        <div class="pop-up-localizacao">
+            <div class="card"> 
+                <button class="dismiss" type="button" onclick="fecharPopUp()">×</button> 
+                <div class=""> 
+                    <div class="loader"></div>
+                    <div class="content">
+                        <span class="title">Onde o ponto Cultural se encontra?</span> 
+                        <p class="message">Atenção: ao clicar na opção: Aqui!, estará compartilhando sua localização atual.</p> 
+                    </div> 
+                    <div class="actions">
+                        <button class="btn btn-secondary" type="button" onclick="obterLocalizacao()">Aqui!</button> 
+                        <button class="btn btn-secondary" type="button">Em outro lugar</button> 
+                    </div> 
+                </div> 
+            </div>
+        </div>
+    </div>
+    <div id="notification-success" class="card" style="display: none;">
+        <svg class="wave" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,256L11.4,240C22.9,224,46,192,69,192C91.4,192,114,224,137,234.7C160,245,183,235,206,213.3C228.6,192,251,160,274,149.3C297.1,139,320,149,343,181.3C365.7,213,389,267,411,282.7C434.3,299,457,277,480,250.7C502.9,224,526,192,549,181.3C571.4,171,594,181,617,208C640,235,663,277,686,256C708.6,235,731,149,754,122.7C777.1,96,800,128,823,165.3C845.7,203,869,245,891,224C914.3,203,937,117,960,112C982.9,107,1006,181,1029,197.3C1051.4,213,1074,171,1097,144C1120,117,1143,107,1166,133.3C1188.6,160,1211,224,1234,218.7C1257.1,213,1280,139,1303,133.3C1325.7,128,1349,192,1371,192C1394.3,192,1417,128,1429,96L1440,64L1440,320L1428.6,320C1417.1,320,1394,320,1371,320C1348.6,320,1326,320,1303,320C1280,320,1257,320,1234,320C1211.4,320,1189,320,1166,320C1142.9,320,1120,320,1097,320C1074.3,320,1051,320,1029,320C1005.7,320,983,320,960,320C937.1,320,914,320,891,320C868.6,320,846,320,823,320C800,320,777,320,754,320C731.4,320,709,320,686,320C662.9,320,640,320,617,320C594.3,320,571,320,549,320C525.7,320,503,320,480,320C457.1,320,434,320,411,320C388.6,320,366,320,343,320C320,320,297,320,274,320C251.4,320,229,320,206,320C182.9,320,160,320,137,320C114.3,320,91,320,69,320C45.7,320,23,320,11,320L0,320Z" fill-opacity="1"></path>
+        </svg>
+        <div class="icon-container">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" stroke-width="0" fill="currentColor" stroke="currentColor" class="icon">
+            <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"></path>
+          </svg>
+        </div>
+        <div class="message-text-container">
+          <p class="message-text">Success message</p>
+          <p class="sub-text">Everything seems great</p>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" stroke-width="0" fill="none" stroke="currentColor" class="cross-icon">
+          <path fill="currentColor" d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+        </svg>
+      </div>
+      
+      <div id="notification-error" class="card" style="display: none;">
+        <svg class="wave" viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,256L11.4,240C22.9,224,46,192,69,192C91.4,192,114,224,137,234.7C160,245,183,235,206,213.3C228.6,192,251,160,274,149.3C297.1,139,320,149,343,181.3C365.7,213,389,267,411,282.7C434.3,299,457,277,480,250.7C502.9,224,526,192,549,181.3C571.4,171,594,181,617,208C640,235,663,277,686,256C708.6,235,731,149,754,122.7C777.1,96,800,128,823,165.3C845.7,203,869,245,891,224C914.3,203,937,117,960,112C982.9,107,1006,181,1029,197.3C1051.4,213,1074,171,1097,144C1120,117,1143,107,1166,133.3C1188.6,160,1211,224,1234,218.7C1257.1,213,1280,139,1303,133.3C1325.7,128,1349,192,1371,192C1394.3,192,1417,128,1429,96L1440,64L1440,320L1428.6,320C1417.1,320,1394,320,1371,320C1348.6,320,1326,320,1303,320C1280,320,1257,320,1234,320C1211.4,320,1189,320,1166,320C1142.9,320,1120,320,1097,320C1074.3,320,1051,320,1029,320C1005.7,320,983,320,960,320C937.1,320,914,320,891,320C868.6,320,846,320,823,320C800,320,777,320,754,320C731.4,320,709,320,686,320C662.9,320,640,320,617,320C594.3,320,571,320,549,320C525.7,320,503,320,480,320C457.1,320,434,320,411,320C388.6,320,366,320,343,320C320,320,297,320,274,320C251.4,320,229,320,206,320C182.9,320,160,320,137,320C114.3,320,91,320,69,320C45.7,320,23,320,11,320L0,320Z" fill-opacity="1"></path>
+        </svg>
+        <div class="icon-container">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" stroke-width="0" fill="currentColor" stroke="currentColor" class="icon">
+            <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"></path>
+          </svg>
+        </div>
+        <div class="message-text-container">
+          <p class="message-text">Error message</p>
+          <p class="sub-text">Something went wrong</p>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" stroke-width="0" fill="none" stroke="currentColor" class="cross-icon">
+          <path fill="currentColor" d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" clip-rule="evenodd" fill-rule="evenodd"></path>
+        </svg>
+      </div>
+      
+    
+
+
+    <script>
+        let coletivos = [];
+        let coletivoAtual = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('static/coletivos.json')
+                .then(response => response.json())
+                .then(data => {
+                    coletivos = data;
+                    
+                    if (Array.isArray(coletivos)) {
+                        if (coletivos.length === 0) {
+                            window.location.href = '/login';
+                        } else {
+                            carregarColetivos();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar o JSON:', error);
+                });
+        });
+
+        function carregarColetivos() {
+            const container = document.getElementById('coletivos_vinculados_a_conta');
+            container.innerHTML = '';
+            
+            coletivos.forEach(coletivo => {
+                const card = document.createElement('div');
+                card.className = 'cookie-card';
+                card.innerHTML = `
+                    <span class="title">${coletivo.nome}</span>
+                    <p class="description">${coletivo.descricao}</p>
+                    <div class="actions">
+                        <a target="_blank" href="${coletivo.link}"><button class="pref">Entrar no site</button></a>
+                        <button class="accept" onclick="editarColetivo(${coletivo.id})">Editar</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function editarColetivo(id) {
+            coletivoAtual = coletivos.find(coletivo => coletivo.id === id);
+
+            if (!coletivoAtual) {
+                console.error('Coletivo não encontrado');
+                return;
+            }
+
+            const formContainer = document.getElementById('form-container');
+            formContainer.style.display = 'block';
+
+            preencherFormulario(coletivoAtual);
+        }
+
+        function preencherFormulario(coletivo) {
+            const form = document.getElementById('coletivoForm');
+            form.elements['nome_projeto'].value = coletivo.nome || '';
+            form.elements['sigla'].value = coletivo.sigla || '';
+            form.elements['link'].value = coletivo.link || '';
+            form.elements['DescColetivo'].value = coletivo.descricao || '';
+            document.getElementById('txtLatitude').value = coletivo.latitude || '';
+            document.getElementById('txtLongitude').value = coletivo.longitude || '';
+        }
+
+        function enviarFormulario(event) {
+    event.preventDefault();
+
+    if (!coletivoAtual) {
+        console.error('Coletivo atual não está definido');
+        return;
+    }
+
+    const formData = {
+        id: coletivoAtual.id, // Adicione o ID do coletivo para a atualização
+        nome_projeto: document.getElementById('nome_projeto').value,
+        sigla: document.getElementById('sigla').value,
+        email: coletivoAtual.email,
+        senha: coletivoAtual.senha,
+        link: document.getElementById('link').value,
+        descricao: document.getElementById('DescColetivo').value,
+        latitude: document.getElementById('txtLatitude').value,
+        longitude: document.getElementById('txtLongitude').value
+    };
+
+    console.log('Dados do formulário:', formData);
+
+    fetch('/atualizar_coletivo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Resposta do servidor:', data);
+        if (data.success) {
+            showNotification('success');
+            setTimeout(() => window.location.reload(), 5000);
+
+            
+        } else {
+            showNotification('error'); // Exibe a notificação de erro
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        showNotification('error'); // Exibe a notificação de erro em caso de exceção
+    });
+}
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const apagarButton = document.getElementById('buttonLink');
+
+            if (apagarButton) {
+                apagarButton.addEventListener('click', async (event) => {
+                    event.preventDefault();
+
+                    try {
+                        const response = await fetch('/clear-coletivos', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            window.location.href = '/';
+                        } else {
+                            console.error('Erro ao limpar o JSON:', result.message);
+                        }
+                    } catch (error) {
+                        console.error('Erro ao limpar o JSON:', error);
+                    }
+                });
+            }
+        });
+        function showNotification(type) {
+    if (type === 'success') {
+        document.getElementById('notification-success').style.display = 'flex';
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('notification-error').style.display = 'none';
+    } else if (type === 'error') {
+        document.getElementById('notification-success').style.display = 'none';
+        document.getElementById('notification-error').style.display = 'block';
+    }
+
+    // Fechar notificação após 5 segundos
+    setTimeout(function() {
+        document.getElementById('notification-success').style.display = 'none';
+        document.getElementById('notification-error').style.display = 'none';
+    }, 5000);
+}
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</body>
+</html>
